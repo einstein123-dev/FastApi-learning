@@ -5,6 +5,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi import FastAPI,Request,HTTPException,status
 # from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from schema import postCreate,postResponse
 
 app = FastAPI()
 app.mount("/static",StaticFiles(directory="static"),name = "static")
@@ -73,7 +74,24 @@ def post_detail(request:Request, post_id:int):
 def get_posts():
     return posts
 
-@app.get('/api/post/{post_id}',include_in_schema=True)
+@app.post(
+    "/api/posts",
+    response_model=postResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_post(post: postCreate):
+    new_id = max(p["id"] for p in posts) + 1 if posts else 1
+    new_post = {
+        "id": new_id,
+        "author": post.author,
+        "title": post.title,
+        "content": post.content,
+        "date_posted": "April 23, 2025",
+    }
+    posts.append(new_post)
+    return new_post
+
+@app.get('/api/post/{post_id}',include_in_schema=True,response_model=list[postResponse])
 def get_post(post_id:int):
     for post in posts:
         if post.get("id") == post_id:
