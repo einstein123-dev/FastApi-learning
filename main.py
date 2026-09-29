@@ -11,7 +11,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 import models
 from database import Base, engine, get_db
-from schemas import PostCreate, PostResponse, UserCreate, UserResponse
+from schema import PostCreate, PostResponse, UserCreate, UserResponse
 
 Base.metadata.create_all(bind=engine)
 
@@ -66,7 +66,7 @@ def user_posts_page(
     posts = result.scalars().all()
     return templates.TemplateResponse(
         request,
-        "user_posts.html",
+        "user_post.html",
         {"posts": posts, "user": user, "title": f"{user.username}'s Posts"},
     )
 
